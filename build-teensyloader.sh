@@ -9,6 +9,9 @@ script_dir=$(dirname "$this_script")
 source "$script_dir/common.bashinc"
 cd "$script_dir"
 
+build_one_help "$@"
+respawn_docker_if_needed "$@"
+
 rcmd() {
     echo "Running: $*"
     "$@"
@@ -24,10 +27,6 @@ triples=(
 )
 
 source_dir="$script_dir/.repos/teensyloader"
-if [ ! -e "$source_dir/.git" ]; then
-    git submodule add https://github.com/PaulStoffregen/teensy_loader_cli.git "$source_dir"
-fi
-
 pushd "$source_dir" >/dev/null 2>&1
 { patch -f -s -p1 <"$script_dir/support/teensyloader/mods.patch"; } || true
 popd >/dev/null 2>&1

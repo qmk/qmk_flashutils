@@ -9,6 +9,9 @@ script_dir=$(dirname "$this_script")
 source "$script_dir/common.bashinc"
 cd "$script_dir"
 
+build_one_help "$@"
+respawn_docker_if_needed "$@"
+
 rcmd() {
     echo "Running: $*"
     "$@"
@@ -23,11 +26,7 @@ triples=(
     x86_64-apple-darwin24
 )
 
-source_dir="$script_dir/.repos/libserialport"
-if [ ! -e "$source_dir/.git" ]; then
-    git submodule add https://github.com/dfu-programmer/dfu-programmer.git "$source_dir"
-fi
-
+source_dir="$script_dir/.repos/dfu-programmer"
 if [ ! -e "$source_dir/configure" ]; then
     pushd "$source_dir" >/dev/null 2>&1
     ./bootstrap.sh
@@ -35,9 +34,6 @@ if [ ! -e "$source_dir/configure" ]; then
 fi
 
 for triple in "${triples[@]}"; do
-    # macOS container Problems...
-    find /gcc /usr/local -path '*'$triple'*include-fixed/dispatch/object.h' -print -exec sudo rm -rf '{}' \; 2>/dev/null || true
-
     echo
     build_dir="$script_dir/.build/$(fn_os_arch_fromtriplet "$triple")/dfu-programmer"
     xroot_dir="$script_dir/.xroot/$(fn_os_arch_fromtriplet "$triple")"

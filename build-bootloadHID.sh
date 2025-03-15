@@ -9,6 +9,9 @@ script_dir=$(dirname "$this_script")
 source "$script_dir/common.bashinc"
 cd "$script_dir"
 
+build_one_help "$@"
+respawn_docker_if_needed "$@"
+
 rcmd() {
     echo "Running: $*"
     "$@"
@@ -26,12 +29,9 @@ triples=(
 source_dir="$script_dir/.repos/bootloadHID"
 if [ ! -d "$source_dir/commandline" ]; then
     mkdir -p "$source_dir"
+    # Originally retrieved from https://www.obdev.at/downloads/vusb/bootloadHID.2012-12-08.tar.gz
     tar axf "$script_dir/.repos/bootloadHID.2012-12-08.tar.gz" -C "$source_dir" --strip-components=1
 fi
-
-# Fix include path issues
-sudo cp /qmk/x86_64-w64-mingw32/sysroot/usr/x86_64-w64-mingw32/include/hidusage.h /qmk/x86_64-w64-mingw32/sysroot/usr/x86_64-w64-mingw32/include/ddk
-sudo cp /qmk/x86_64-w64-mingw32/sysroot/usr/x86_64-w64-mingw32/include/hidpi.h /qmk/x86_64-w64-mingw32/sysroot/usr/x86_64-w64-mingw32/include/ddk
 
 for triple in "${triples[@]}"; do
     echo

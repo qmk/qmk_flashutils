@@ -9,6 +9,9 @@ script_dir=$(dirname "$this_script")
 source "$script_dir/common.bashinc"
 cd "$script_dir"
 
+build_one_help "$@"
+respawn_docker_if_needed "$@"
+
 rcmd() {
     echo "Running: $*"
     "$@"
@@ -24,10 +27,6 @@ triples=(
 )
 
 source_dir="$script_dir/.repos/libserialport"
-if [ ! -e "$source_dir/.git" ]; then
-    git submodule add git://sigrok.org/libserialport "$source_dir"
-fi
-
 if [ ! -e "$source_dir/configure" ]; then
     pushd "$source_dir" >/dev/null 2>&1
     ./autogen.sh
@@ -43,7 +42,7 @@ for triple in "${triples[@]}"; do
     pushd "$build_dir" >/dev/null 2>&1
     rm -rf "$build_dir/*"
 
-    rcmd "$source_dir/configure" --prefix="$xroot_dir" --host=$triple --enable-shared=no --enable-static CC="${triple}-gcc" CXX="${triple}-g++"
+    rcmd "$source_dir/configure" --prefix="$xroot_dir" --host=$triple --enable-shared=no --disable-shared --enable-static CC="${triple}-gcc" CXX="${triple}-g++"
     make clean
     make -j$(nproc) install
     popd >/dev/null 2>&1

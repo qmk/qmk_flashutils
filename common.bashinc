@@ -23,7 +23,25 @@ function respawn_docker_if_needed() {
             ./$(basename $this_script) "$@"
         exit $?
     fi
+
+    ############################################################################
+    # If we're in the container, we need to fix up some environmental issues
+
+    # macOS include path issues...
+    find /gcc /usr/local -path '*/include-fixed/dispatch/object.h' -print -exec sudo rm -rf '{}' \; 2>/dev/null || true
+
+    # mingw64 include path issues...
+    sudo cp /qmk/x86_64-w64-mingw32/sysroot/usr/x86_64-w64-mingw32/include/hidusage.h /qmk/x86_64-w64-mingw32/sysroot/usr/x86_64-w64-mingw32/include/ddk
+    sudo cp /qmk/x86_64-w64-mingw32/sysroot/usr/x86_64-w64-mingw32/include/hidpi.h /qmk/x86_64-w64-mingw32/sysroot/usr/x86_64-w64-mingw32/include/ddk
 }
+
+echo
+echo '========================================================================'
+echo '========================================================================'
+echo "== ${this_script:-${BASH_SOURCE[0]}} $@"
+echo '========================================================================'
+echo '========================================================================'
+echo
 
 function havecmd() {
     type "${1}" >/dev/null 2>&1 || return 1

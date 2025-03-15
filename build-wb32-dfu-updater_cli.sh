@@ -9,6 +9,9 @@ script_dir=$(dirname "$this_script")
 source "$script_dir/common.bashinc"
 cd "$script_dir"
 
+build_one_help "$@"
+respawn_docker_if_needed "$@"
+
 rcmd() {
     echo "Running: $*"
     "$@"
@@ -24,10 +27,6 @@ triples=(
 )
 
 source_dir="$script_dir/.repos/wb32-dfu-updater_cli"
-if [ ! -e "$source_dir/.git" ]; then
-    git submodule add https://github.com/WestberryTech/wb32-dfu-updater.git "$source_dir"
-fi
-
 for triple in "${triples[@]}"; do
     echo
     build_dir="$script_dir/.build/$(fn_os_arch_fromtriplet "$triple")/wb32-dfu-updater_cli"

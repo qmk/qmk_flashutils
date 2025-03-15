@@ -1,0 +1,61 @@
+---
+name: 2. (qmk) Repack release from tzarc/qmk_flashutils
+
+on:
+  workflow_dispatch:
+    inputs:
+      tzarc_release_tag:
+        description: "Tag of the tzarc/qmk_flashutils release to repack"
+        required: true
+        default: "latest"
+      qmk_release_tag:
+        description: "Tag of the QMK release to publish as"
+        required: true
+        default: "latest"
+
+permissions:
+  contents: write
+
+jobs:
+  repack_artifacts:
+    name: Repack and release toolchains
+    if: github.repository == 'qmk/qmk_flashutils'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clone toolchains repo
+        uses: actions/checkout@v4
+
+      - name: Delete tag
+        run: gh release delete ${{ inputs.qmk_release_tag }} --cleanup-tag || true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Prerequisites
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y jq curl
+
+      - name: Download and repack tzarc/qmk_flashutils release
+        run: |
+          curl -fsSL https://api.github.com/repos/tzarc/qmk_flashutils/releases/tags/${{ inputs.tzarc_release_tag }} > release.json
+          jq -r '.assets[] | select(.name | contains("qmk_flashutils")) | .browser_download_url' release.json > flasher_urls.txt
+          for arch in linuxARM64 linuxX64 linuxRV64 macosARM64 macosX64 windowsX64; do
+              for url in $(grep $arch flasher_urls.txt); do
+                  echo Downloading ${url}...
+                  curl -fsSLO $url
+              done
+          done
+
+      - name: Dump list
+        run: |
+          ls -1al *.tar.zst
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            qmk_flashutils*
+          tag_name: ${{ inputs.qmk_release_tag }}
+          draft: false
+          prerelease: false
+          make_latest: true

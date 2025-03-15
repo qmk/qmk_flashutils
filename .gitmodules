@@ -28,3 +28,6 @@
 [submodule ".repos/wb32-dfu-updater_cli"]
 	path = .repos/wb32-dfu-updater_cli
 	url = https://github.com/WestberryTech/wb32-dfu-updater.git
+[submodule ".repos/dfu-programmer"]
+	path = .repos/dfu-programmer
+	url = https://github.com/dfu-programmer/dfu-programmer.git

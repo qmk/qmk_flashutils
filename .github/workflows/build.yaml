@@ -1,0 +1,57 @@
+---
+name: 1. (tzarc) Build flashing utils
+
+on:
+  workflow_dispatch:
+
+env:
+  TC_WORKDIR: /t
+  EXECUTE_UNDER_DOCKER: true
+
+jobs:
+  build:
+    name: Build flashing utils
+    runs-on: ubuntu-latest
+    steps:
+      - name: Clone toolchains repo
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          set-safe-directory: true
+
+      - name: Perform build
+        run: |
+          ./build.sh
+
+      - name: Upload flashing utils
+        uses: actions/upload-artifact@v4
+        with:
+          name: qmk_flashutils
+          path: qmk_flashutils*.tar.zst
+
+      - name: Delete tag
+        run: gh release delete latest --cleanup-tag || true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            qmk_flashutils*
+          tag_name: latest
+
+      - name: Gather build logs
+        if: always() && !cancelled()
+        run: |
+          set -x
+          find . \( -name \*.log \) -print0 | xargs -0 tar acvf build_logs.tar.zst || true
+
+      - name: Upload build logs
+        uses: actions/upload-artifact@v4
+        if: always() && !cancelled()
+        with:
+          name: build.logs
+          path: |
+            build_logs.tar.zst
+
