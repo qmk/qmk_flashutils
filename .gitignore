@@ -1,0 +1,6 @@
+.build
+.xroot
+
+.repos/bootloadHID
+
+qmk_flashutils*

@@ -1,0 +1,174 @@
+#!/usr/bin/env bash
+# Copyright 2024-2025 Nick Brassel (@tzarc)
+# SPDX-License-Identifier: GPL-2.0-or-later
+
+set -eEuo pipefail
+
+# macOS SDK Version
+export SDK_VERSION=15.0
+# macOS Target Version (Monterey)
+export MACOSX_DEPLOYMENT_TARGET=12.0
+
+# If necessary, re-exec with a clean environment inside docker
+function respawn_docker_if_needed() {
+    if [[ "$(uname -s)" == "Linux" ]] && [[ -n "${EXECUTE_UNDER_DOCKER:-}" ]]; then
+        eval "$(parse_args "$@")"
+        [ -n "${container_image:-}" ] || container_image='ghcr.io/tzarc/qmk_toolchains:builder'
+        cd "$script_dir"
+        docker run --rm \
+            -v "$script_dir:$TC_WORKDIR" \
+            -w "$TC_WORKDIR" \
+            -e TC_WORKDIR="$TC_WORKDIR" \
+            $container_image \
+            ./$(basename $this_script) "$@"
+        exit $?
+    fi
+}
+
+function havecmd() {
+    type "${1}" >/dev/null 2>&1 || return 1
+}
+
+havecmd gsed && SED=gsed || SED=sed
+
+function fn_os() {
+    local os_name=$(echo ${1:-} | tr 'A-Z' 'a-z')
+    if [[ -z "$os_name" ]]; then
+        os_name=$(uname -s | tr 'A-Z' 'a-z')
+    fi
+    case "$os_name" in
+    *darwin* | *macos* | *apple*)
+        echo macos
+        ;;
+    *windows* | *mingw* | *w64*)
+        echo windows
+        ;;
+    *linux*)
+        echo linux
+        ;;
+    *none* | *unknown* | *picolibc* | *nano*)
+        echo baremetal
+        ;;
+    *)
+        echo unknown
+        ;;
+    esac
+}
+
+function fn_arch() {
+    local arch_name=$(echo ${1:-} | tr 'A-Z' 'a-z')
+    if [[ -z "$arch_name" ]]; then
+        arch_name=$(uname -m | tr 'A-Z' 'a-z')
+    fi
+    case "$arch_name" in
+    *arm64* | *aarch64*)
+        echo ARM64
+        ;;
+    *arm*)
+        echo ARM
+        ;;
+    *riscv32*)
+        echo RV32
+        ;;
+    *riscv64*)
+        echo RV64
+        ;;
+    *avr*)
+        echo AVR
+        ;;
+    *x86_64* | *x64*)
+        echo X64
+        ;;
+    *)
+        echo unknown
+        ;;
+    esac
+}
+
+function fn_os_arch() {
+    echo $(fn_os ${1:-})$(fn_arch ${2:-})
+}
+
+function fn_os_arch_fromtriplet() {
+    local input_var=${1:-}
+
+    # AVR is a special snowflake.
+    if [[ "$input_var" == "avr" ]]; then
+        fn_os_arch_fromtriplet avr-none-none
+        return
+    fi
+
+    # Remove the qmk vendor from the bootstrapped compiler
+    input_var=$(echo $input_var | sed -e 's@qmk-@@g')
+
+    local input_arch=$(echo $input_var | cut -d'-' -f1)
+    local input_os=$(echo $input_var | cut -d'-' -f2)
+
+    # Try to skip vendor
+    if [[ "$input_os" == "unknown" ]] || [[ "$input_os" == "none" ]] || [[ "$input_os" == "pc" ]] || [[ "$input_os" == "rpi3" ]] || [[ "$input_os" == "w64" ]]; then
+        input_os=$(echo $input_var | cut -d'-' -f3)
+    fi
+
+    # If we're into the ABI stuff, then backtrack
+    if [[ "$input_os" == "eabi" ]] || [[ "$input_os" == "elf" ]] || [[ "$input_os" == "mingw32" ]]; then
+        input_os=$(echo $input_var | cut -d'-' -f2)
+    fi
+
+    fn_os_arch $input_os $input_arch
+}
+
+function build_one_args() {
+    cat <<__EOT__
+--help                  -- Shows this help text
+--container-image       -- Which container image to use.
+__EOT__
+}
+
+function build_one_help() {
+    for arg in "$@"; do
+        case "$arg" in
+        --help)
+            echo
+            echo "$(basename $this_script) $(build_one_args | grep '(required)' | ${SED} -e 's@\s\+--.*@@g') $(build_one_args | sort | grep '(optional)' | ${SED} -e 's@\s\+--.*@@g' -e 's@^@[@' -e 's@$@]@' | tr '\n' ' ')"
+            echo
+            build_one_args
+            exit 0
+            ;;
+        esac
+    done
+}
+
+function parse_args() {
+    set -eEuo pipefail
+    umask 022
+
+    while read arg; do
+        unset $arg
+    done < <(build_one_args | ${SED} -e 's@\s\+--.*@@g' -e 's@^--@@g' -e 's@-@_@g' -e 's@=.*@@g')
+    unset arg
+
+    local -a positional_args=()
+    while [[ ! -z "${1:-}" ]]; do
+        case "$1" in
+        --*=*)
+            N=${1%%=*}
+            N=${N##--}
+            N=$(echo $N | tr '-' '_')
+            V=${1##*=}
+            echo export $N="$V"
+            ;;
+        --*)
+            N=${1##--}
+            N=$(echo $N | tr '-' '_')
+            echo export $N=true
+            ;;
+        *)
+            positional_args+=($1)
+            ;;
+        esac
+        shift
+        unset N
+        unset V
+    done
+    echo "positional_args=("${positional_args[@]}")"
+}
