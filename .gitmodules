@@ -31,3 +31,6 @@
 [submodule ".repos/dfu-programmer"]
 	path = .repos/dfu-programmer
 	url = https://github.com/dfu-programmer/dfu-programmer.git
+[submodule ".repos/hidapi"]
+	path = .repos/hidapi
+	url = https://github.com/libusb/hidapi.git

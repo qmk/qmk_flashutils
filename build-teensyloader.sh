@@ -25,7 +25,7 @@ for triple in "${triples[@]}"; do
     echo "Building teensyloader for $triple => $build_dir"
     rm -rf "$build_dir/*"
 
-    CFLAGS="$(pkg-config --with-path="$xroot_dir/lib/pkgconfig" --static --cflags libusb) -I$script_dir/support/hidapi"
+    CFLAGS="$(pkg-config --with-path="$xroot_dir/lib/pkgconfig" --static --cflags libusb) -I$script_dir/.repos/hidapi/hidapi -I$script_dir/.repos/hidapi/windows"
     LDFLAGS="$(pkg-config --with-path="$xroot_dir/lib/pkgconfig" --static --libs libusb) -L$xroot_dir/lib"
 
     pushd "$source_dir" >/dev/null 2>&1
