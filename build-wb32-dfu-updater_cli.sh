@@ -12,20 +12,6 @@ cd "$script_dir"
 build_one_help "$@"
 respawn_docker_if_needed "$@"
 
-rcmd() {
-    echo "Running: $*"
-    "$@"
-}
-
-triples=(
-    x86_64-qmk-linux-gnu
-    aarch64-unknown-linux-gnu
-    riscv64-unknown-linux-gnu
-    x86_64-w64-mingw32
-    aarch64-apple-darwin24
-    x86_64-apple-darwin24
-)
-
 source_dir="$script_dir/.repos/wb32-dfu-updater_cli"
 for triple in "${triples[@]}"; do
     echo
@@ -58,7 +44,7 @@ for triple in "${triples[@]}"; do
 
     # For some reason, the install target resets permissions for Windows builds.
     if [ -n "$(fn_os_arch_fromtriplet $triple | grep windows)" ]; then
-        chmod 755 "$xroot_dir/bin/wb32-dfu-updater_cli.exe"
+        rcmd chmod 755 "$xroot_dir/bin/wb32-dfu-updater_cli.exe"
     fi
 
     popd >/dev/null 2>&1

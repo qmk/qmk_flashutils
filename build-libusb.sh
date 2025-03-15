@@ -12,20 +12,6 @@ cd "$script_dir"
 build_one_help "$@"
 respawn_docker_if_needed "$@"
 
-rcmd() {
-    echo "Running: $*"
-    "$@"
-}
-
-triples=(
-    x86_64-qmk-linux-gnu
-    aarch64-unknown-linux-gnu
-    riscv64-unknown-linux-gnu
-    x86_64-w64-mingw32
-    aarch64-apple-darwin24
-    x86_64-apple-darwin24
-)
-
 source_dir="$script_dir/.repos/libusb"
 if [ ! -e "$source_dir/configure" ]; then
     pushd "$source_dir" >/dev/null 2>&1
@@ -41,8 +27,9 @@ for triple in "${triples[@]}"; do
     echo "Building libusb for $triple => $build_dir"
     pushd "$build_dir" >/dev/null 2>&1
     rm -rf "$build_dir/*"
+    
     rcmd "$source_dir/configure" --prefix="$xroot_dir" --host=$triple --enable-shared=no --enable-static --disable-udev CC="${triple}-gcc" CXX="${triple}-g++" CFLAGS="-fPIC" LDFLAGS="-fPIC"
-    make clean
-    make -j$(nproc) install
+    rcmd make clean
+    rcmd make -j$(nproc) install
     popd >/dev/null 2>&1
 done

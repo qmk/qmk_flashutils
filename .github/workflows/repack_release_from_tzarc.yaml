@@ -46,6 +46,10 @@ jobs:
               done
           done
 
+          ls -1 qmk_flashutils*.tar.zst | while read -r file; do
+              mv $file $(echo $file | sed -e 's@qmk_flashutils@qmk_flashutils-${{ inputs.qmk_release_tag }}@g')
+          done
+
       - name: Dump list
         run: |
           ls -1al *.tar.zst

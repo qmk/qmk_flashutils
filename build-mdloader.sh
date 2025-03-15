@@ -12,20 +12,6 @@ cd "$script_dir"
 build_one_help "$@"
 respawn_docker_if_needed "$@"
 
-rcmd() {
-    echo "Running: $*"
-    "$@"
-}
-
-triples=(
-    x86_64-qmk-linux-gnu
-    aarch64-unknown-linux-gnu
-    riscv64-unknown-linux-gnu
-    x86_64-w64-mingw32
-    aarch64-apple-darwin24
-    x86_64-apple-darwin24
-)
-
 source_dir="$script_dir/.repos/mdloader"
 for triple in "${triples[@]}"; do
     echo
@@ -50,8 +36,8 @@ for triple in "${triples[@]}"; do
         LDFLAGS="-static"
     fi
 
-    make clean
-    make -j$(nproc) OBJDIR="$build_dir" CC="${triple}-gcc" CXX="${triple}-g++" OS=${OS:-} CFLAGS="${CFLAGS:-}" LDFLAGS="${LDFLAGS:-}"
-    cp "$build_dir/mdloader"* "$xroot_dir/bin"
+    rcmd make clean
+    rcmd make -j$(nproc) OBJDIR="$build_dir" CC="${triple}-gcc" CXX="${triple}-g++" OS=${OS:-} CFLAGS="${CFLAGS:-}" LDFLAGS="${LDFLAGS:-}"
+    rcmd cp "$build_dir/mdloader"* "$xroot_dir/bin"
     popd >/dev/null 2>&1
 done

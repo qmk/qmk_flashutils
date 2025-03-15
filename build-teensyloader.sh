@@ -12,20 +12,6 @@ cd "$script_dir"
 build_one_help "$@"
 respawn_docker_if_needed "$@"
 
-rcmd() {
-    echo "Running: $*"
-    "$@"
-}
-
-triples=(
-    x86_64-qmk-linux-gnu
-    aarch64-unknown-linux-gnu
-    riscv64-unknown-linux-gnu
-    x86_64-w64-mingw32
-    aarch64-apple-darwin24
-    x86_64-apple-darwin24
-)
-
 source_dir="$script_dir/.repos/teensyloader"
 pushd "$source_dir" >/dev/null 2>&1
 { patch -f -s -p1 <"$script_dir/support/teensyloader/mods.patch"; } || true
@@ -59,8 +45,8 @@ for triple in "${triples[@]}"; do
         LDFLAGS="-static $LDFLAGS"
     fi
 
-    make clean
-    make -j$(nproc) OBJDIR="$build_dir" CC="${triple}-gcc" OS=${OS:-} SDK=${SDK:-} CFLAGS="$CFLAGS" LDFLAGS="$LDFLAGS" USE_LIBUSB=YES OUTDIR="$build_dir"
-    cp "$build_dir/teensy_loader_cli"* "$xroot_dir/bin"
+    rcmd make clean
+    rcmd make -j$(nproc) OBJDIR="$build_dir" CC="${triple}-gcc" OS=${OS:-} SDK=${SDK:-} CFLAGS="$CFLAGS" LDFLAGS="$LDFLAGS" USE_LIBUSB=YES OUTDIR="$build_dir"
+    rcmd cp "$build_dir/teensy_loader_cli"* "$xroot_dir/bin"
     popd >/dev/null 2>&1
 done

@@ -12,20 +12,6 @@ cd "$script_dir"
 build_one_help "$@"
 respawn_docker_if_needed "$@"
 
-rcmd() {
-    echo "Running: $*"
-    "$@"
-}
-
-triples=(
-    x86_64-qmk-linux-gnu
-    aarch64-unknown-linux-gnu
-    riscv64-unknown-linux-gnu
-    x86_64-w64-mingw32
-    aarch64-apple-darwin24
-    x86_64-apple-darwin24
-)
-
 source_dir="$script_dir/.repos/dfu-programmer"
 if [ ! -e "$source_dir/configure" ]; then
     pushd "$source_dir" >/dev/null 2>&1
@@ -58,7 +44,7 @@ for triple in "${triples[@]}"; do
     fi
 
     rcmd "$source_dir/configure" --prefix="$xroot_dir" --host=$triple CC="${triple}-gcc" CXX="${triple}-g++" LDFLAGS="$LDFLAGS" CFLAGS="$CFLAGS" CXXFLAGS="$CFLAGS"
-    make clean
-    make -j$(nproc) install || true # Makefile fails to deal with the bash completion files so we `|| true` to ignore the error
+    rcmd make clean
+    rcmd make -j$(nproc) install || true # Makefile fails to deal with the bash completion files so we `|| true` to ignore the error
     popd >/dev/null 2>&1
 done
