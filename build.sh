@@ -11,6 +11,7 @@ cd "$script_dir"
 
 ./build-libusb.sh
 ./build-libusb-compat.sh
+./build-hidapi.sh
 ./build-libftdi.sh
 ./build-libserialport.sh
 ./build-dfu-programmer.sh
