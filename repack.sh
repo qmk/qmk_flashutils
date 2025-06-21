@@ -38,3 +38,19 @@ for triple in "${triples[@]}"; do
 
     rcmd tar acvf "$script_dir/qmk_flashutils-$(fn_os_arch_fromtriplet "$triple").tar.zst" -C "$pkg_dir" .
 done
+
+# Make fat binaries for macOS
+mkdir -p "$script_dir/.pkg/macosUNIVERSAL"
+for bin in "$script_dir"/.pkg/macosX64/*; do
+    if [ -x "$bin" ]; then
+        echo "Creating fat binary for $bin"
+        rcmd aarch64-apple-darwin24-lipo -create -output "$script_dir/.pkg/macosUNIVERSAL/$(basename "${bin}")" "$bin" "$script_dir/.pkg/macosARM64/$(basename "$bin")"
+        rcmd rcodesign sign --runtime-version 12.0.0 --code-signature-flags runtime "$script_dir/.pkg/macosUNIVERSAL/$(basename "${bin}")" || true
+        aarch64-apple-darwin24-lipo -info "$script_dir/.pkg/macosUNIVERSAL/$(basename "${bin}")"
+    else
+        cp "$bin" "$script_dir/.pkg/macosUNIVERSAL/"
+    fi
+done
+
+rcmd tar acvf "$script_dir/qmk_flashutils-macosUNIVERSAL.tar.zst" -C "$script_dir/.pkg/macosUNIVERSAL" .
+
