@@ -36,6 +36,10 @@ for triple in "${triples[@]}"; do
     rcmd rsync -a --exclude=libusb-config --exclude=elf2tag "$xroot_dir/bin/" "$pkg_dir/"
     rcmd rsync -a "$xroot_dir/etc/" "$pkg_dir/"
 
+    echo "FLASHUTILS_HOST=$(fn_os_arch_fromtriplet $triple)" >"$pkg_dir/flashutils_release_$(fn_os_arch_fromtriplet $triple)"
+    echo "COMMIT_DATE=$(date -u -d "$(git show --no-patch --format=%cI HEAD)" +%Y-%m-%dT%H:%M:%SZ)" >>"$pkg_dir/flashutils_release_$(fn_os_arch_fromtriplet $triple)"
+    echo "COMMIT_HASH=$(git describe --always --dirty --exclude '*')" >>"$pkg_dir/flashutils_release_$(fn_os_arch_fromtriplet $triple)"
+
     rcmd tar acvf "$script_dir/qmk_flashutils-$(fn_os_arch_fromtriplet "$triple").tar.zst" -C "$pkg_dir" .
 done
 
@@ -51,6 +55,11 @@ for bin in "$script_dir"/.pkg/macosX64/*; do
         cp "$bin" "$script_dir/.pkg/macosUNIVERSAL/"
     fi
 done
+
+rm -f "$script_dir/.pkg/macosUNIVERSAL/flashutils_release"* || true
+echo "FLASHUTILS_HOST=macosUNIVERSAL" >"$script_dir/.pkg/macosUNIVERSAL/flashutils_release_macosUNIVERSAL"
+echo "COMMIT_DATE=$(date -u -d "$(git show --no-patch --format=%cI HEAD)" +%Y-%m-%dT%H:%M:%SZ)" >>"$script_dir/.pkg/macosUNIVERSAL/flashutils_release_macosUNIVERSAL"
+echo "COMMIT_HASH=$(git describe --always --dirty --exclude '*')" >>"$script_dir/.pkg/macosUNIVERSAL/flashutils_release_macosUNIVERSAL"
 
 rcmd tar acvf "$script_dir/qmk_flashutils-macosUNIVERSAL.tar.zst" -C "$script_dir/.pkg/macosUNIVERSAL" .
 
