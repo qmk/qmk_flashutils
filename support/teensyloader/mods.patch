@@ -1,5 +1,5 @@
 diff --git a/Makefile b/Makefile
-index 2d1bda1..bb1af2d 100644
+index 2d1bda1..596d5b4 100644
 --- a/Makefile
 +++ b/Makefile
 @@ -8,26 +8,28 @@ OS ?= LINUX
@@ -23,7 +23,7 @@ index 2d1bda1..bb1af2d 100644
 -teensy_loader_cli.exe: teensy_loader_cli.c
 -	$(CC) $(CFLAGS) -s -DUSE_WIN32 -o teensy_loader_cli.exe teensy_loader_cli.c -lhid -lsetupapi -lwinmm
 +$(OUTDIR)/teensy_loader_cli.exe: teensy_loader_cli.c
-+	$(CC) $(CFLAGS) -s -DUSE_WIN32 -o $(OUTDIR)/teensy_loader_cli.exe teensy_loader_cli.c -lhid -lsetupapi -lwinmm
++	$(CC) $(CFLAGS) -s -DUSE_LIBUSB -o $(OUTDIR)/teensy_loader_cli.exe teensy_loader_cli.c -lusb-1.0 $(LDFLAGS)
  
  
  else ifeq ($(OS), MACOSX)
@@ -62,19 +62,16 @@ index 2d1bda1..bb1af2d 100644
  
  endif
 diff --git a/teensy_loader_cli.c b/teensy_loader_cli.c
-index 523f2af..19263e2 100644
+index 523f2af..8904074 100644
 --- a/teensy_loader_cli.c
 +++ b/teensy_loader_cli.c
-@@ -370,8 +370,10 @@ int soft_reboot(void)
- // http://msdn.microsoft.com/en-us/library/ms790932.aspx
- #include <windows.h>
- #include <setupapi.h>
--#include <ddk/hidsdi.h>
--#include <ddk/hidclass.h>
-+#include <hidapi_hidsdi.h>
-+#include <hidapi_hidclass.h>
-+
-+#include "hid.c"
+@@ -1029,6 +1032,9 @@ int printf_verbose(const char *format, ...)
+ 	return 0;
+ }
  
- HANDLE open_usb_device(int vid, int pid)
++#ifdef WIN32
++#include <windows.h>
++#endif
+ void delay(double seconds)
  {
+ 	#ifdef WIN32
