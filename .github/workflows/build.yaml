@@ -24,7 +24,7 @@ jobs:
           ./build.sh
 
       - name: Upload flashing utils
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: qmk_flashutils
           path: qmk_flashutils*.tar.zst
@@ -48,7 +48,7 @@ jobs:
           find . \( -name \*.log \) -print0 | xargs -0 tar acvf build_logs.tar.zst || true
 
       - name: Upload build logs
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         if: always() && !cancelled()
         with:
           name: build.logs
