@@ -73,7 +73,7 @@ rcmd tar acvf "$script_dir/qmk_flashutils-macosUNIVERSAL.tar.zst" \
 
 # Make WSL package which includes Windows EXEs and support wrappers
 mkdir -p "$script_dir/.pkg/windowsWSL"
-for bin in "$script_dir"/.pkg/windowsX64/*; do
+for bin in $(ls -1 $script_dir"/.pkg/windowsX64/"*.exe); do
     basebin=$(basename "$bin" .exe)
     if [ -x "$bin" ] && [ -f "$script_dir/support/wsl/$basebin" ]; then
         echo "Copying WSL wrapper for $bin"
