@@ -12,6 +12,8 @@ cd "$script_dir"
 build_one_help "$@"
 respawn_docker_if_needed "$@"
 
+COMMIT_DATE=$(date -u -d "$(git show --no-patch --format=%cI HEAD)" +%Y-%m-%dT%H:%M:%SZ)
+
 for triple in "${triples[@]}"; do
     xroot_dir="$script_dir/.xroot/$(fn_os_arch_fromtriplet "$triple")"
     pkg_dir="$script_dir/.pkg/$(fn_os_arch_fromtriplet "$triple")"
@@ -37,10 +39,13 @@ for triple in "${triples[@]}"; do
     rcmd rsync -a "$xroot_dir/etc/" "$pkg_dir/"
 
     echo "FLASHUTILS_HOST=$(fn_os_arch_fromtriplet $triple)" >"$pkg_dir/flashutils_release_$(fn_os_arch_fromtriplet $triple)"
-    echo "COMMIT_DATE=$(date -u -d "$(git show --no-patch --format=%cI HEAD)" +%Y-%m-%dT%H:%M:%SZ)" >>"$pkg_dir/flashutils_release_$(fn_os_arch_fromtriplet $triple)"
+    echo "COMMIT_DATE=$COMMIT_DATE" >>"$pkg_dir/flashutils_release_$(fn_os_arch_fromtriplet $triple)"
     echo "COMMIT_HASH=$(git describe --always --dirty --exclude '*')" >>"$pkg_dir/flashutils_release_$(fn_os_arch_fromtriplet $triple)"
 
-    rcmd tar acvf "$script_dir/qmk_flashutils-$(fn_os_arch_fromtriplet "$triple").tar.zst" -C "$pkg_dir" .
+    rcmd tar acvf "$script_dir/qmk_flashutils-$(fn_os_arch_fromtriplet "$triple").tar.zst" \
+        --sort=name --format=posix --pax-option='exthdr.name=%d/PaxHeaders/%f' --pax-option='delete=atime,delete=ctime' \
+        --clamp-mtime --mtime="${COMMIT_DATE}"  --numeric-owner --owner=0 --group=0 --mode='go+u,go-w' \
+        -C "$pkg_dir" .
 done
 
 # Make fat binaries for macOS
@@ -58,10 +63,13 @@ done
 
 rm -f "$script_dir/.pkg/macosUNIVERSAL/flashutils_release"* || true
 echo "FLASHUTILS_HOST=macosUNIVERSAL" >"$script_dir/.pkg/macosUNIVERSAL/flashutils_release_macosUNIVERSAL"
-echo "COMMIT_DATE=$(date -u -d "$(git show --no-patch --format=%cI HEAD)" +%Y-%m-%dT%H:%M:%SZ)" >>"$script_dir/.pkg/macosUNIVERSAL/flashutils_release_macosUNIVERSAL"
+echo "COMMIT_DATE=$COMMIT_DATE" >>"$script_dir/.pkg/macosUNIVERSAL/flashutils_release_macosUNIVERSAL"
 echo "COMMIT_HASH=$(git describe --always --dirty --exclude '*')" >>"$script_dir/.pkg/macosUNIVERSAL/flashutils_release_macosUNIVERSAL"
 
-rcmd tar acvf "$script_dir/qmk_flashutils-macosUNIVERSAL.tar.zst" -C "$script_dir/.pkg/macosUNIVERSAL" .
+rcmd tar acvf "$script_dir/qmk_flashutils-macosUNIVERSAL.tar.zst" \
+    --sort=name --format=posix --pax-option='exthdr.name=%d/PaxHeaders/%f' --pax-option='delete=atime,delete=ctime' \
+    --clamp-mtime --mtime="${COMMIT_DATE}"  --numeric-owner --owner=0 --group=0 --mode='go+u,go-w' \
+    -C "$script_dir/.pkg/macosUNIVERSAL" .
 
 # Make WSL package which includes Windows EXEs and support wrappers
 mkdir -p "$script_dir/.pkg/windowsWSL"
@@ -77,6 +85,9 @@ done
 
 rm -f "$script_dir/.pkg/windowsWSL/flashutils_release"* || true
 echo "FLASHUTILS_HOST=windowsWSL" >"$script_dir/.pkg/windowsWSL/flashutils_release_windowsWSL"
-echo "COMMIT_DATE=$(date -u -d "$(git show --no-patch --format=%cI HEAD)" +%Y-%m-%dT%H:%M:%SZ)" >>"$script_dir/.pkg/windowsWSL/flashutils_release_windowsWSL"
+echo "COMMIT_DATE=$COMMIT_DATE" >>"$script_dir/.pkg/windowsWSL/flashutils_release_windowsWSL"
 echo "COMMIT_HASH=$(git describe --always --dirty --exclude '*')" >>"$script_dir/.pkg/windowsWSL/flashutils_release_windowsWSL"
-rcmd tar acvf "$script_dir/qmk_flashutils-windowsWSL.tar.zst" -C "$script_dir/.pkg/windowsWSL" .
+rcmd tar acvf "$script_dir/qmk_flashutils-windowsWSL.tar.zst" \
+    --sort=name --format=posix --pax-option='exthdr.name=%d/PaxHeaders/%f' --pax-option='delete=atime,delete=ctime' \
+    --clamp-mtime --mtime="${COMMIT_DATE}"  --numeric-owner --owner=0 --group=0 --mode='go+u,go-w' \
+    -C "$script_dir/.pkg/windowsWSL" .
