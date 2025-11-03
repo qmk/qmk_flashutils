@@ -63,3 +63,20 @@ echo "COMMIT_HASH=$(git describe --always --dirty --exclude '*')" >>"$script_dir
 
 rcmd tar acvf "$script_dir/qmk_flashutils-macosUNIVERSAL.tar.zst" -C "$script_dir/.pkg/macosUNIVERSAL" .
 
+# Make WSL package which includes Windows EXEs and support wrappers
+mkdir -p "$script_dir/.pkg/windowsWSL"
+for bin in "$script_dir"/.pkg/windowsX64/*; do
+    basebin=$(basename "$bin" .exe)
+    if [ -x "$bin" ] && [ -f "$script_dir/support/wsl/$basebin" ]; then
+        echo "Copying WSL wrapper for $bin"
+        cp "$script_dir/support/wsl/$basebin" "$script_dir/.pkg/windowsWSL/$basebin"
+        chmod +x "$script_dir/.pkg/windowsWSL/$basebin"
+    fi
+    cp "$bin" "$script_dir/.pkg/windowsWSL/$basebin.exe"
+done
+
+rm -f "$script_dir/.pkg/windowsWSL/flashutils_release"* || true
+echo "FLASHUTILS_HOST=windowsWSL" >"$script_dir/.pkg/windowsWSL/flashutils_release_windowsWSL"
+echo "COMMIT_DATE=$(date -u -d "$(git show --no-patch --format=%cI HEAD)" +%Y-%m-%dT%H:%M:%SZ)" >>"$script_dir/.pkg/windowsWSL/flashutils_release_windowsWSL"
+echo "COMMIT_HASH=$(git describe --always --dirty --exclude '*')" >>"$script_dir/.pkg/windowsWSL/flashutils_release_windowsWSL"
+rcmd tar acvf "$script_dir/qmk_flashutils-windowsWSL.tar.zst" -C "$script_dir/.pkg/windowsWSL" .
