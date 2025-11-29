@@ -39,7 +39,7 @@ jobs:
         run: |
           curl -fsSL https://api.github.com/repos/tzarc/qmk_flashutils/releases/tags/${{ inputs.tzarc_release_tag }} > release.json
           jq -r '.assets[] | select(.name | contains("qmk_flashutils")) | .browser_download_url' release.json > flasher_urls.txt
-          for arch in linuxARM64 linuxX64 linuxRV64 macosARM64 macosX64 macosUNIVERSAL windowsX64; do
+          for arch in linuxARM64 linuxX64 linuxRV64 macosARM64 macosX64 macosUNIVERSAL windowsX64 windowsWSL; do
               for url in $(grep $arch flasher_urls.txt); do
                   echo Downloading ${url}...
                   curl -fsSLO $url
