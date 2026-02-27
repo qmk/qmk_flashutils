@@ -1,7 +1,12 @@
+.direnv
+
 .build
 .xroot
+.xroot-shared
 .pkg
+.pkg-hidapi
 
 .repos/bootloadHID
 
 qmk_flashutils*
+qmk_hidapi*

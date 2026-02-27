@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Copyright 2024-2025 Nick Brassel (@tzarc)
+# Copyright 2024-2026 Nick Brassel (@tzarc)
 # SPDX-License-Identifier: GPL-2.0-or-later
 
 set -eEuo pipefail
@@ -33,7 +33,22 @@ for triple in "${triples[@]}"; do
         echo "SDK_VERSION=$SDK_VERSION"
     fi
 
-    rcmd cmake "$source_dir" -DCMAKE_BUILD_TYPE=Release -G Ninja -DCMAKE_TOOLCHAIN_FILE="$script_dir/support/$(fn_os_arch_fromtriplet "$triple")-toolchain.cmake" -DCMAKE_PREFIX_PATH="$xroot_dir" -DCMAKE_INSTALL_PREFIX="$xroot_dir" -DCMAKE_INSTALL_LIBDIR="$xroot_dir/lib" -DCMAKE_C_FLAGS="$CFLAGS" -DCMAKE_EXE_LINKER_FLAGS="$LDFLAGS" -DSTATICLIBS=ON -DDOCUMENTATION=OFF -DBUILD_TESTS=OFF -DFTDIPP=OFF -DPYTHON_BINDINGS=OFF -DFTDI_EEPROM=OFF -DEXAMPLES=OFF
+    rcmd cmake "$source_dir" \
+        -DCMAKE_BUILD_TYPE=Release \
+        -G Ninja \
+        -DCMAKE_TOOLCHAIN_FILE="$script_dir/support/$(fn_os_arch_fromtriplet "$triple")-toolchain.cmake" \
+        -DCMAKE_PREFIX_PATH="$xroot_dir" \
+        -DCMAKE_INSTALL_PREFIX="$xroot_dir" \
+        -DCMAKE_INSTALL_LIBDIR="$xroot_dir/lib" \
+        -DCMAKE_C_FLAGS="$CFLAGS" \
+        -DCMAKE_EXE_LINKER_FLAGS="$LDFLAGS" \
+        -DSTATICLIBS=ON \
+        -DDOCUMENTATION=OFF \
+        -DBUILD_TESTS=OFF \
+        -DFTDIPP=OFF \
+        -DPYTHON_BINDINGS=OFF \
+        -DFTDI_EEPROM=OFF \
+        -DEXAMPLES=OFF
     rcmd cmake --build . --target ftdi1-static -- -j$(nproc)
     rcmd cmake --install . --component staticlibs
     rcmd cmake --install . --component headers

@@ -1,17 +1,16 @@
----
 name: 2. (qmk) Repack release from tzarc/qmk_flashutils
 
 on:
   workflow_dispatch:
     inputs:
       tzarc_release_tag:
-        description: "Tag of the tzarc/qmk_flashutils release to repack"
+        description: Tag of the tzarc/qmk_flashutils release to repack
         required: true
-        default: "latest"
+        default: latest
       qmk_release_tag:
-        description: "Tag of the QMK release to publish as"
+        description: Tag of the QMK release to publish as
         required: true
-        default: "latest"
+        default: latest
 
 permissions:
   contents: write
@@ -38,9 +37,9 @@ jobs:
       - name: Download and repack tzarc/qmk_flashutils release
         run: |
           curl -fsSL https://api.github.com/repos/tzarc/qmk_flashutils/releases/tags/${{ inputs.tzarc_release_tag }} > release.json
-          jq -r '.assets[] | select(.name | contains("qmk_flashutils")) | .browser_download_url' release.json > flasher_urls.txt
+          jq -r '.assets[] | select(.name | contains("qmk_flashutils") or contains("qmk_hidapi")) | .browser_download_url' release.json > asset_urls.txt
           for arch in linuxARM64 linuxX64 linuxRV64 macosARM64 macosX64 macosUNIVERSAL windowsX64 windowsWSL; do
-              for url in $(grep $arch flasher_urls.txt); do
+              for url in $(grep $arch asset_urls.txt); do
                   echo Downloading ${url}...
                   curl -fsSLO $url
               done
@@ -48,6 +47,10 @@ jobs:
 
           ls -1 qmk_flashutils*.tar.zst | while read -r file; do
               mv $file $(echo $file | sed -e 's@qmk_flashutils@qmk_flashutils-${{ inputs.qmk_release_tag }}@g')
+          done
+
+          ls -1 qmk_hidapi*.tar.zst | while read -r file; do
+              mv $file $(echo $file | sed -e 's@qmk_hidapi@qmk_hidapi-${{ inputs.qmk_release_tag }}@g')
           done
 
       - name: Dump list
@@ -59,6 +62,7 @@ jobs:
         with:
           files: |
             qmk_flashutils*
+            qmk_hidapi*
           tag_name: ${{ inputs.qmk_release_tag }}
           draft: false
           prerelease: false

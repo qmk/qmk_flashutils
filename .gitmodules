@@ -1,36 +1,36 @@
 [submodule ".repos/libusb"]
-	path = .repos/libusb
-	url = https://github.com/libusb/libusb.git
+    path = .repos/libusb
+    url = https://github.com/libusb/libusb.git
 [submodule ".repos/libusb-compat"]
-	path = .repos/libusb-compat
-	url = https://github.com/libusb/libusb-compat-0.1.git
+    path = .repos/libusb-compat
+    url = https://github.com/libusb/libusb-compat-0.1.git
 [submodule ".repos/libftdi"]
-	path = .repos/libftdi
-	url = git://developer.intra2net.com/libftdi
+    path = .repos/libftdi
+    url = git://developer.intra2net.com/libftdi
 [submodule ".repos/libserialport"]
-	path = .repos/libserialport
-	url = git://sigrok.org/libserialport
+    path = .repos/libserialport
+    url = git://sigrok.org/libserialport
 [submodule ".repos/dfu-util"]
-	path = .repos/dfu-util
-	url = https://git.code.sf.net/p/dfu-util/dfu-util
+    path = .repos/dfu-util
+    url = https://git.code.sf.net/p/dfu-util/dfu-util
 [submodule ".repos/avrdude"]
-	path = .repos/avrdude
-	url = https://github.com/avrdudes/avrdude.git
+    path = .repos/avrdude
+    url = https://github.com/avrdudes/avrdude.git
 [submodule ".repos/mdloader"]
-	path = .repos/mdloader
-	url = https://github.com/massdrop/mdloader.git
+    path = .repos/mdloader
+    url = https://github.com/massdrop/mdloader.git
 [submodule ".repos/teensyloader"]
-	path = .repos/teensyloader
-	url = https://github.com/PaulStoffregen/teensy_loader_cli.git
+    path = .repos/teensyloader
+    url = https://github.com/PaulStoffregen/teensy_loader_cli.git
 [submodule ".repos/hid_bootloader_cli"]
-	path = .repos/hid_bootloader_cli
-	url = https://github.com/abcminiuser/lufa.git
+    path = .repos/hid_bootloader_cli
+    url = https://github.com/abcminiuser/lufa.git
 [submodule ".repos/wb32-dfu-updater_cli"]
-	path = .repos/wb32-dfu-updater_cli
-	url = https://github.com/WestberryTech/wb32-dfu-updater.git
+    path = .repos/wb32-dfu-updater_cli
+    url = https://github.com/WestberryTech/wb32-dfu-updater.git
 [submodule ".repos/dfu-programmer"]
-	path = .repos/dfu-programmer
-	url = https://github.com/dfu-programmer/dfu-programmer.git
+    path = .repos/dfu-programmer
+    url = https://github.com/dfu-programmer/dfu-programmer.git
 [submodule ".repos/hidapi"]
-	path = .repos/hidapi
-	url = https://github.com/libusb/hidapi.git
+    path = .repos/hidapi
+    url = https://github.com/libusb/hidapi.git

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Copyright 2024-2025 Nick Brassel (@tzarc)
+# Copyright 2024-2026 Nick Brassel (@tzarc)
 # SPDX-License-Identifier: GPL-2.0-or-later
 
 set -eEuo pipefail
@@ -39,7 +39,16 @@ for triple in "${triples[@]}"; do
         LDFLAGS="${LDFLAGS:-} -static"
     fi
 
-    rcmd cmake "$source_dir" -DCMAKE_BUILD_TYPE=Release -G Ninja -DCMAKE_TOOLCHAIN_FILE="$script_dir/support/$(fn_os_arch_fromtriplet "$triple")-toolchain.cmake" -DCMAKE_PREFIX_PATH="$xroot_dir" -DCMAKE_INSTALL_PREFIX="$xroot_dir" -DCMAKE_C_FLAGS="$CFLAGS" -DCMAKE_EXE_LINKER_FLAGS="$LDFLAGS" -DLIBUSB_INCLUDE_DIRS="$LIBUSB_INCLUDE_DIRS" -DLIBUSB_LIBRARIES="$LIBUSB_LIBRARIES"
+    rcmd cmake "$source_dir" \
+        -DCMAKE_BUILD_TYPE=Release \
+        -G Ninja \
+        -DCMAKE_TOOLCHAIN_FILE="$script_dir/support/$(fn_os_arch_fromtriplet "$triple")-toolchain.cmake" \
+        -DCMAKE_PREFIX_PATH="$xroot_dir" \
+        -DCMAKE_INSTALL_PREFIX="$xroot_dir" \
+        -DCMAKE_C_FLAGS="$CFLAGS" \
+        -DCMAKE_EXE_LINKER_FLAGS="$LDFLAGS" \
+        -DLIBUSB_INCLUDE_DIRS="$LIBUSB_INCLUDE_DIRS" \
+        -DLIBUSB_LIBRARIES="$LIBUSB_LIBRARIES"
     rcmd cmake --build . --target install -- -j$(nproc)
 
     # For some reason, the install target resets permissions for Windows builds.

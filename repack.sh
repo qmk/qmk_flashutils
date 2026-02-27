@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Copyright 2024-2025 Nick Brassel (@tzarc)
+# Copyright 2024-2026 Nick Brassel (@tzarc)
 # SPDX-License-Identifier: GPL-2.0-or-later
 
 set -eEuo pipefail
@@ -44,7 +44,7 @@ for triple in "${triples[@]}"; do
 
     rcmd tar acvf "$script_dir/qmk_flashutils-$(fn_os_arch_fromtriplet "$triple").tar.zst" \
         --sort=name --format=posix --pax-option='exthdr.name=%d/PaxHeaders/%f' --pax-option='delete=atime,delete=ctime' \
-        --clamp-mtime --mtime="${COMMIT_DATE}"  --numeric-owner --owner=0 --group=0 --mode='go+u,go-w' \
+        --clamp-mtime --mtime="${COMMIT_DATE}" --numeric-owner --owner=0 --group=0 --mode='go+u,go-w' \
         -C "$pkg_dir" .
 done
 
@@ -68,7 +68,7 @@ echo "COMMIT_HASH=$(git describe --always --dirty --exclude '*')" >>"$script_dir
 
 rcmd tar acvf "$script_dir/qmk_flashutils-macosUNIVERSAL.tar.zst" \
     --sort=name --format=posix --pax-option='exthdr.name=%d/PaxHeaders/%f' --pax-option='delete=atime,delete=ctime' \
-    --clamp-mtime --mtime="${COMMIT_DATE}"  --numeric-owner --owner=0 --group=0 --mode='go+u,go-w' \
+    --clamp-mtime --mtime="${COMMIT_DATE}" --numeric-owner --owner=0 --group=0 --mode='go+u,go-w' \
     -C "$script_dir/.pkg/macosUNIVERSAL" .
 
 # Make WSL package which includes Windows EXEs and support wrappers
@@ -89,5 +89,5 @@ echo "COMMIT_DATE=$COMMIT_DATE" >>"$script_dir/.pkg/windowsWSL/flashutils_releas
 echo "COMMIT_HASH=$(git describe --always --dirty --exclude '*')" >>"$script_dir/.pkg/windowsWSL/flashutils_release_windowsWSL"
 rcmd tar acvf "$script_dir/qmk_flashutils-windowsWSL.tar.zst" \
     --sort=name --format=posix --pax-option='exthdr.name=%d/PaxHeaders/%f' --pax-option='delete=atime,delete=ctime' \
-    --clamp-mtime --mtime="${COMMIT_DATE}"  --numeric-owner --owner=0 --group=0 --mode='go+u,go-w' \
+    --clamp-mtime --mtime="${COMMIT_DATE}" --numeric-owner --owner=0 --group=0 --mode='go+u,go-w' \
     -C "$script_dir/.pkg/windowsWSL" .

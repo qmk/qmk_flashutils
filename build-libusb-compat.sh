@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Copyright 2024-2025 Nick Brassel (@tzarc)
+# Copyright 2024-2026 Nick Brassel (@tzarc)
 # SPDX-License-Identifier: GPL-2.0-or-later
 
 set -eEuo pipefail
@@ -35,8 +35,16 @@ for triple in "${triples[@]}"; do
     # dfu-util includes `libusb-1.0` in its paths, so we need the parent.
     CFLAGS="$CFLAGS -I$xroot_dir/include"
 
-
-    rcmd "$source_dir/configure" --prefix="$xroot_dir" --host=$triple --enable-shared=no --enable-static --disable-udev CC="${triple}-gcc" CXX="${triple}-g++" LIBUSB_1_0_CFLAGS="$CFLAGS" LIBUSB_1_0_LIBS="$LDFLAGS"
+    rcmd "$source_dir/configure" \
+        --prefix="$xroot_dir" \
+        --host=$triple \
+        --enable-shared=no \
+        --enable-static \
+        --disable-udev \
+        CC="${triple}-gcc" \
+        CXX="${triple}-g++" \
+        LIBUSB_1_0_CFLAGS="$CFLAGS" \
+        LIBUSB_1_0_LIBS="$LDFLAGS"
     rcmd make clean
     rcmd make -j$(nproc) install
     popd >/dev/null 2>&1

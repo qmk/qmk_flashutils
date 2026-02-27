@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Copyright 2024-2025 Nick Brassel (@tzarc)
+# Copyright 2024-2026 Nick Brassel (@tzarc)
 # SPDX-License-Identifier: GPL-2.0-or-later
 
 set -eEuo pipefail
@@ -15,7 +15,7 @@ respawn_docker_if_needed "$@"
 source_dir="$script_dir/.repos/dfu-util"
 if [ ! -e "$source_dir/configure" ]; then
     pushd "$source_dir" >/dev/null 2>&1
-    { patch -f -s -p1 < "$script_dir/support/dfu-util/configure.patch"; } || true
+    { patch -f -s -p1 <"$script_dir/support/dfu-util/configure.patch"; } || true
     ./autogen.sh
     popd >/dev/null 2>&1
 fi
@@ -43,7 +43,14 @@ for triple in "${triples[@]}"; do
         echo "SDK_VERSION=$SDK_VERSION"
     fi
 
-    rcmd "$source_dir/configure" --prefix="$xroot_dir" --host=$triple CC="${triple}-gcc" CXX="${triple}-g++" LDFLAGS="$LDFLAGS" CFLAGS="$CFLAGS" CXXFLAGS="$CFLAGS"
+    rcmd "$source_dir/configure" \
+        --prefix="$xroot_dir" \
+        --host=$triple \
+        CC="${triple}-gcc" \
+        CXX="${triple}-g++" \
+        LDFLAGS="$LDFLAGS" \
+        CFLAGS="$CFLAGS" \
+        CXXFLAGS="$CFLAGS"
     rcmd make clean
     rcmd make -j$(nproc) install || true # Makefile fails to deal with the bash completion files so we `|| true` to ignore the error
     popd >/dev/null 2>&1

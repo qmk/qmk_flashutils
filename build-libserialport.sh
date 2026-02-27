@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Copyright 2024-2025 Nick Brassel (@tzarc)
+# Copyright 2024-2026 Nick Brassel (@tzarc)
 # SPDX-License-Identifier: GPL-2.0-or-later
 
 set -eEuo pipefail
@@ -28,7 +28,14 @@ for triple in "${triples[@]}"; do
     pushd "$build_dir" >/dev/null 2>&1
     rm -rf "$build_dir/*"
 
-    rcmd "$source_dir/configure" --prefix="$xroot_dir" --host=$triple --enable-shared=no --disable-shared --enable-static CC="${triple}-gcc" CXX="${triple}-g++"
+    rcmd "$source_dir/configure" \
+        --prefix="$xroot_dir" \
+        --host=$triple \
+        --enable-shared=no \
+        --disable-shared \
+        --enable-static \
+        CC="${triple}-gcc" \
+        CXX="${triple}-g++"
     rcmd make clean
     rcmd make -j$(nproc) install
     popd >/dev/null 2>&1

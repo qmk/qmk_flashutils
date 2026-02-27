@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Copyright 2024-2025 Nick Brassel (@tzarc)
+# Copyright 2024-2026 Nick Brassel (@tzarc)
 # SPDX-License-Identifier: GPL-2.0-or-later
 
 set -eEuo pipefail
@@ -43,7 +43,14 @@ for triple in "${triples[@]}"; do
         echo "SDK_VERSION=$SDK_VERSION"
     fi
 
-    rcmd "$source_dir/configure" --prefix="$xroot_dir" --host=$triple CC="${triple}-gcc" CXX="${triple}-g++" LDFLAGS="$LDFLAGS" CFLAGS="$CFLAGS" CXXFLAGS="$CFLAGS"
+    rcmd "$source_dir/configure" \
+        --prefix="$xroot_dir" \
+        --host=$triple \
+        CC="${triple}-gcc" \
+        CXX="${triple}-g++" \
+        LDFLAGS="$LDFLAGS" \
+        CFLAGS="$CFLAGS" \
+        CXXFLAGS="$CFLAGS"
     rcmd make clean
     rcmd make -j$(nproc) install || true # Makefile fails to deal with the bash completion files so we `|| true` to ignore the error
     popd >/dev/null 2>&1

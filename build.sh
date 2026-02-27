@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Copyright 2024-2025 Nick Brassel (@tzarc)
+# Copyright 2024-2026 Nick Brassel (@tzarc)
 # SPDX-License-Identifier: GPL-2.0-or-later
 
 set -eEuo pipefail
@@ -12,6 +12,7 @@ cd "$script_dir"
 ./build-libusb.sh
 ./build-libusb-compat.sh
 ./build-hidapi.sh
+./build-hidapi-shared.sh
 ./build-libftdi.sh
 ./build-libserialport.sh
 ./build-dfu-programmer.sh
@@ -24,5 +25,7 @@ cd "$script_dir"
 ./build-wb32-dfu-updater_cli.sh
 
 ls -1alR "$script_dir/.xroot"
+ls -1alR "$script_dir/.xroot-shared"
 
 ./repack.sh
+./repack-hidapi-shared.sh

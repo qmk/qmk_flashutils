@@ -25,4 +25,3 @@ Currently provides:
 Builds require the toolchains provided by the container `ghcr.io/tzarc/qmk_toolchains:builder`; this repo must be mounted on `/t` inside the container -- the user/group permissions inside the container will be updated to match during execution.
 
 Corresponding builds are done on GitHub actions.
-

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Copyright 2024-2025 Nick Brassel (@tzarc)
+# Copyright 2024-2026 Nick Brassel (@tzarc)
 # SPDX-License-Identifier: GPL-2.0-or-later
 
 set -eEuo pipefail
@@ -40,7 +40,16 @@ for triple in "${triples[@]}"; do
         EXTRA_ARGS="-DHIDAPI_WITH_HIDRAW=OFF -DHIDAPI_WITH_LIBUSB=ON"
     fi
 
-    rcmd cmake "$source_dir" -DCMAKE_BUILD_TYPE=Release -G Ninja -DCMAKE_TOOLCHAIN_FILE="$script_dir/support/$(fn_os_arch_fromtriplet "$triple")-toolchain.cmake" -DCMAKE_PREFIX_PATH="$xroot_dir" -DCMAKE_INSTALL_PREFIX="$xroot_dir" -DCMAKE_C_FLAGS="$CFLAGS" -DCMAKE_EXE_LINKER_FLAGS="$LDFLAGS" -DBUILD_SHARED_LIBS=OFF ${EXTRA_ARGS:-}
+    rcmd cmake "$source_dir" \
+        -DCMAKE_BUILD_TYPE=Release \
+        -G Ninja \
+        -DCMAKE_TOOLCHAIN_FILE="$script_dir/support/$(fn_os_arch_fromtriplet "$triple")-toolchain.cmake" \
+        -DCMAKE_PREFIX_PATH="$xroot_dir" \
+        -DCMAKE_INSTALL_PREFIX="$xroot_dir" \
+        -DCMAKE_C_FLAGS="$CFLAGS" \
+        -DCMAKE_EXE_LINKER_FLAGS="$LDFLAGS" \
+        -DBUILD_SHARED_LIBS=OFF \
+        ${EXTRA_ARGS:-}
     rcmd cmake --build . --target install -- -j$(nproc)
     popd >/dev/null 2>&1
 done
