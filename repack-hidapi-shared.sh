@@ -55,6 +55,10 @@ for triple in "${triples[@]}"; do
         rcmd rcodesign sign --runtime-version 12.0.0 --code-signature-flags runtime "$pkg_dir/$lib_name" || true
     fi
 
+    echo "HIDAPI_HOST=$(fn_os_arch_fromtriplet $triple)" >"$pkg_dir/hidapi_release_$(fn_os_arch_fromtriplet $triple)"
+    echo "COMMIT_DATE=$COMMIT_DATE" >>"$pkg_dir/hidapi_release_$(fn_os_arch_fromtriplet $triple)"
+    echo "COMMIT_HASH=$(git describe --always --dirty --exclude '*')" >>"$pkg_dir/hidapi_release_$(fn_os_arch_fromtriplet $triple)"
+
     rcmd tar acvf "$script_dir/qmk_hidapi-$(fn_os_arch_fromtriplet "$triple").tar.zst" \
         --sort=name --format=posix --pax-option='exthdr.name=%d/PaxHeaders/%f' --pax-option='delete=atime,delete=ctime' \
         --clamp-mtime --mtime="${COMMIT_DATE}" --numeric-owner --owner=0 --group=0 --mode='go+u,go-w' \
@@ -70,6 +74,10 @@ rcmd aarch64-apple-darwin24-lipo -create \
     "$script_dir/.pkg-hidapi/macosARM64/libhidapi.dylib"
 rcmd rcodesign sign --runtime-version 12.0.0 --code-signature-flags runtime "$script_dir/.pkg-hidapi/macosUNIVERSAL/libhidapi.dylib" || true
 aarch64-apple-darwin24-lipo -info "$script_dir/.pkg-hidapi/macosUNIVERSAL/libhidapi.dylib"
+
+echo "HIDAPI_HOST=macosUNIVERSAL" >"$script_dir/.pkg-hidapi/macosUNIVERSAL/hidapi_release_macosUNIVERSAL"
+echo "COMMIT_DATE=$COMMIT_DATE" >>"$script_dir/.pkg-hidapi/macosUNIVERSAL/hidapi_release_macosUNIVERSAL"
+echo "COMMIT_HASH=$(git describe --always --dirty --exclude '*')" >>"$script_dir/.pkg-hidapi/macosUNIVERSAL/hidapi_release_macosUNIVERSAL"
 
 rcmd tar acvf "$script_dir/qmk_hidapi-macosUNIVERSAL.tar.zst" \
     --sort=name --format=posix --pax-option='exthdr.name=%d/PaxHeaders/%f' --pax-option='delete=atime,delete=ctime' \
