@@ -24,6 +24,7 @@ for triple in "${triples[@]}"; do
 
     CFLAGS=$(pkg-config --with-path="$xroot_dir/lib/pkgconfig" --static --cflags libusb-1.0 libserialport)
     LDFLAGS=$(pkg-config --with-path="$xroot_dir/lib/pkgconfig" --static --libs libusb-1.0 libserialport)
+    STANDARD_LIBS=""
 
     if [ -n "$(fn_os_arch_fromtriplet $triple | grep macos)" ]; then
         echo "MACOSX_DEPLOYMENT_TARGET=$MACOSX_DEPLOYMENT_TARGET"
@@ -34,6 +35,8 @@ for triple in "${triples[@]}"; do
     else
         CFLAGS="$CFLAGS -static"
         LDFLAGS="$LDFLAGS -static -pthread"
+        # hidapi-hidraw needs libudev — place after all target_link_libraries entries
+        STANDARD_LIBS="-ludev"
     fi
 
     rcmd cmake "$source_dir" \
@@ -43,7 +46,8 @@ for triple in "${triples[@]}"; do
         -DCMAKE_PREFIX_PATH="$xroot_dir" \
         -DCMAKE_INSTALL_PREFIX="$xroot_dir" \
         -DCMAKE_C_FLAGS="$CFLAGS" \
-        -DCMAKE_EXE_LINKER_FLAGS="$LDFLAGS"
+        -DCMAKE_EXE_LINKER_FLAGS="$LDFLAGS" \
+        -DCMAKE_C_STANDARD_LIBRARIES="$STANDARD_LIBS"
     rcmd cmake --build . --target install -- -j$(nproc)
     popd >/dev/null 2>&1
 done
