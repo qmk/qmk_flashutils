@@ -22,22 +22,21 @@ for triple in "${triples[@]}"; do
     pushd "$build_dir" >/dev/null 2>&1
     rm -rf "$build_dir/*"
 
-    CFLAGS=$(pkg-config --with-path="$xroot_dir/lib/pkgconfig" --static --cflags libusb-1.0)
-    LDFLAGS=$(pkg-config --with-path="$xroot_dir/lib/pkgconfig" --static --libs libusb-1.0)
+    unset EXTRA_ARGS
 
     if [ -n "$(fn_os_arch_fromtriplet $triple | grep macos)" ]; then
         echo "MACOSX_DEPLOYMENT_TARGET=$MACOSX_DEPLOYMENT_TARGET"
         echo "SDK_VERSION=$SDK_VERSION"
+        CFLAGS="$(pkg-config --with-path="$xroot_dir/lib/pkgconfig" --static --cflags libusb-1.0)"
         CFLAGS="$CFLAGS -include $script_dir/support/macos-common/forward-decl.h"
-        unset EXTRA_ARGS
+        LDFLAGS="$(pkg-config --with-path="$xroot_dir/lib/pkgconfig" --static --libs libusb-1.0)"
     elif [ -n "$(fn_os_arch_fromtriplet $triple | grep windows)" ]; then
-        CFLAGS="$CFLAGS -static"
-        LDFLAGS="$LDFLAGS -static -pthread"
-        unset EXTRA_ARGS
+        CFLAGS="$(pkg-config --with-path="$xroot_dir/lib/pkgconfig" --static --cflags libusb-1.0) -static"
+        LDFLAGS="$(pkg-config --with-path="$xroot_dir/lib/pkgconfig" --static --libs libusb-1.0) -static -pthread"
     else
-        CFLAGS="$CFLAGS -static"
-        LDFLAGS="$LDFLAGS -static -pthread"
-        EXTRA_ARGS="-DHIDAPI_WITH_HIDRAW=OFF -DHIDAPI_WITH_LIBUSB=ON"
+        CFLAGS="$(pkg-config --with-path="$xroot_dir/lib/pkgconfig" --static --cflags libudev) -static"
+        LDFLAGS="$(pkg-config --with-path="$xroot_dir/lib/pkgconfig" --static --libs libudev) -static -pthread"
+        EXTRA_ARGS="-DHIDAPI_WITH_HIDRAW=ON -DHIDAPI_WITH_LIBUSB=OFF"
     fi
 
     rcmd cmake "$source_dir" \

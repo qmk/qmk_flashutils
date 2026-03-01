@@ -34,3 +34,6 @@
 [submodule ".repos/hidapi"]
     path = .repos/hidapi
     url = https://github.com/libusb/hidapi.git
+[submodule ".repos/eudev"]
+    path = .repos/eudev
+    url = https://github.com/eudev-project/eudev.git

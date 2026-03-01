@@ -37,10 +37,10 @@ for triple in "${triples[@]}"; do
         LDFLAGS=""
     else
         CFLAGS="-fPIC"
-        CFLAGS="$CFLAGS $(pkg-config --with-path="$xroot_dir/lib/pkgconfig" --static --cflags libusb-1.0)"
+        CFLAGS="$CFLAGS $(pkg-config --with-path="$xroot_dir/lib/pkgconfig" --static --cflags libudev)"
         LDFLAGS="-pthread"
-        EXTRA_ARGS="-DHIDAPI_WITH_HIDRAW=OFF -DHIDAPI_WITH_LIBUSB=ON"
-        EXTRA_LDFLAGS="$(pkg-config --with-path="$xroot_dir/lib/pkgconfig" --static --libs libusb-1.0)"
+        EXTRA_ARGS="-DHIDAPI_WITH_HIDRAW=ON -DHIDAPI_WITH_LIBUSB=OFF"
+        EXTRA_LDFLAGS="$(pkg-config --with-path="$xroot_dir/lib/pkgconfig" --static --libs libudev)"
     fi
 
     rcmd cmake "$source_dir" \

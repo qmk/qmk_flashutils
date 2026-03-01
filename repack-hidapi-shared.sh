@@ -34,8 +34,8 @@ for triple in "${triples[@]}"; do
 
     # Find and copy the shared library, renaming if necessary
     if [ -n "$(fn_os_arch_fromtriplet $triple | grep linux)" ]; then
-        # Linux builds produce libhidapi-libusb.so*, we need libhidapi.so
-        src_lib=$(find "$xroot_shared_dir/lib" -name 'libhidapi-libusb.so*' -not -type l | head -1)
+        # Linux builds produce libhidapi-hidraw.so*, we need libhidapi.so
+        src_lib=$(find "$xroot_shared_dir/lib" -name 'libhidapi-hidraw.so*' -not -type l | head -1)
         if [ -z "$src_lib" ]; then
             src_lib=$(find "$xroot_shared_dir/lib" -name 'libhidapi*.so*' -not -type l | head -1)
         fi

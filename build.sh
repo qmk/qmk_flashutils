@@ -11,6 +11,7 @@ cd "$script_dir"
 
 ./build-libusb.sh
 ./build-libusb-compat.sh
+./build-eudev.sh
 ./build-hidapi.sh
 ./build-hidapi-shared.sh
 ./build-libftdi.sh
