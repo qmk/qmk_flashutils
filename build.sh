@@ -24,6 +24,7 @@ cd "$script_dir"
 ./build-bootloadHID.sh
 ./build-hid_bootloader_cli.sh
 ./build-wb32-dfu-updater_cli.sh
+./build-picotool.sh
 
 ls -1alR "$script_dir/.xroot"
 ls -1alR "$script_dir/.xroot-shared"
