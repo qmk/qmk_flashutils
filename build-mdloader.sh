@@ -24,15 +24,15 @@ for triple in "${triples[@]}"; do
 
     if [ -n "$(fn_os_arch_fromtriplet $triple | grep windows)" ]; then
         OS=Windows_NT
-        CFLAGS="-static"
+        CFLAGS="-Os -static"
         LDFLAGS="-static"
     elif [ -n "$(fn_os_arch_fromtriplet $triple | grep macos)" ]; then
         unset OS
-        unset CFLAGS
+        CFLAGS="-Os"
         unset LDFLAGS
     else
         unset OS
-        CFLAGS="-static"
+        CFLAGS="-Os -static"
         LDFLAGS="-static"
     fi
 

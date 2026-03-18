@@ -47,7 +47,7 @@ for triple in "${triples[@]}"; do
         --disable-hwdb \
         CC="${triple}-gcc" \
         CXX="${triple}-g++" \
-        CFLAGS="-fPIC"
+        CFLAGS="-Os -fPIC"
     rcmd make clean
     rcmd make -j$(nproc) install
     popd >/dev/null 2>&1

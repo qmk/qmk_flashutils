@@ -43,6 +43,7 @@ for triple in "${triples[@]}"; do
         --disable-udev \
         CC="${triple}-gcc" \
         CXX="${triple}-g++" \
+        CFLAGS="-Os" \
         LIBUSB_1_0_CFLAGS="$CFLAGS" \
         LIBUSB_1_0_LIBS="$LDFLAGS"
     rcmd make clean

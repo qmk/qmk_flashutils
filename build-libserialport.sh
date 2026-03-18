@@ -35,7 +35,8 @@ for triple in "${triples[@]}"; do
         --disable-shared \
         --enable-static \
         CC="${triple}-gcc" \
-        CXX="${triple}-g++"
+        CXX="${triple}-g++" \
+        CFLAGS="-Os"
     rcmd make clean
     rcmd make -j$(nproc) install
     popd >/dev/null 2>&1

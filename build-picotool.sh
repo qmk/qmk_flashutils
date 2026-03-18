@@ -45,7 +45,7 @@ for triple in "${triples[@]}"; do
     fi
 
     rcmd cmake "$source_dir" \
-        -DCMAKE_BUILD_TYPE=Release \
+        -DCMAKE_BUILD_TYPE=MinSizeRel \
         -G Ninja \
         -DCMAKE_TOOLCHAIN_FILE="$script_dir/support/$(fn_os_arch_fromtriplet "$triple")-toolchain.cmake" \
         -DCMAKE_PREFIX_PATH="$xroot_dir" \

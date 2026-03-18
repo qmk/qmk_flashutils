@@ -32,7 +32,7 @@ for triple in "${triples[@]}"; do
     LDFLAGS=$(pkg-config --with-path="$xroot_dir/lib/pkgconfig" --static --libs libusb-1.0)
 
     # bootloadHID includes `libusb-1.0` in its paths, so we need the parent.
-    CFLAGS="$CFLAGS -I$xroot_dir/include"
+    CFLAGS="$CFLAGS -Os -I$xroot_dir/include"
 
     if [ -n "$(fn_os_arch_fromtriplet $triple | grep macos)" ]; then
         echo "MACOSX_DEPLOYMENT_TARGET=$MACOSX_DEPLOYMENT_TARGET"

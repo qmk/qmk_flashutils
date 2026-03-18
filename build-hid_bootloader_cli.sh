@@ -25,7 +25,7 @@ for triple in "${triples[@]}"; do
     echo "Building hid_bootloader_cli for $triple => $build_dir"
     rm -rf "$build_dir/*"
 
-    CFLAGS="$(pkg-config --with-path="$xroot_dir/lib/pkgconfig" --static --cflags libusb) -I$script_dir/support/hid_bootloader_cli"
+    CFLAGS="$(pkg-config --with-path="$xroot_dir/lib/pkgconfig" --static --cflags libusb) -Os -I$script_dir/support/hid_bootloader_cli"
     LDFLAGS="$(pkg-config --with-path="$xroot_dir/lib/pkgconfig" --static --libs libusb) -L$xroot_dir/lib"
 
     pushd "$source_dir/Bootloaders/HID/HostLoaderApp" >/dev/null 2>&1

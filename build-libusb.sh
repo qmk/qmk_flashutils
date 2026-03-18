@@ -36,7 +36,7 @@ for triple in "${triples[@]}"; do
         --disable-udev \
         CC="${triple}-gcc" \
         CXX="${triple}-g++" \
-        CFLAGS="-fPIC" \
+        CFLAGS="-Os -fPIC" \
         LDFLAGS="-fPIC"
     rcmd make clean
     rcmd make -j$(nproc) install
