@@ -36,6 +36,7 @@ for triple in "${triples[@]}"; do
         echo "MACOSX_DEPLOYMENT_TARGET=$MACOSX_DEPLOYMENT_TARGET"
         echo "SDK_VERSION=$SDK_VERSION"
         CFLAGS="$CFLAGS -include $script_dir/support/macos-common/forward-decl.h"
+        LDFLAGS="$LDFLAGS -static-libstdc++ -static-libgcc"
     elif [ -n "$(fn_os_arch_fromtriplet $triple | grep windows)" ]; then
         CFLAGS="$CFLAGS -static"
         LDFLAGS="$LDFLAGS -static -pthread"
